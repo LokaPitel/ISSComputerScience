@@ -25,8 +25,14 @@ def get_all_nodes():
 
     return result
 
-def ngram(one, another):
+def ngram_(one, another):
     gram_len = 5
+
+    if (len(one) < 5):
+        gram_len = len(one)
+
+    if (len(another) < 5):
+        gram_len = len(another)
 
     one_trigram = [one[i:i + gram_len] for i in range(len(one) - (gram_len - 1))]
     another_trigram = [another[i:i + gram_len] for i in range(len(another) - (gram_len - 1))]
@@ -40,6 +46,10 @@ def ngram(one, another):
         coeff = 1 / coeff
 
     return intersect / union * coeff
+
+
+def ngram_wrap(one, another):
+    return ngram_(one.lower(), another.lower())
 
 def get_all_nodes_by_name(name):
     result = []
@@ -59,7 +69,10 @@ def get_all_nodes_by_name(name):
             # if (name_distance > 3):
             #     continue
 
-            name_distance = ngram(name, node.get('name')) * 100
+            if (node.get('name') == 'Цикл'):
+                print('test')
+
+            name_distance = ngram_wrap(name, node.get('name')) * 100
 
             if (name_distance < 10):
                 continue
@@ -90,8 +103,8 @@ def get_all_nodes_by_name_and_description(name):
             #         for word in description.split(' '):
             #             description_distance = min(description_distance, distance(word, name_word))
 
-            name_distance = ngram(name, node.get('name')) * 100
-            description_distance = ngram(name, description) * 100
+            name_distance = ngram_wrap(name, node.get('name')) * 100
+            description_distance = ngram_wrap(name, description) * 100
 
             if (name_distance < 10 and description_distance < 10):
                 continue
@@ -126,7 +139,7 @@ def get_discipline_nodes_by_name(name, disciplines):
             # if (name_distance > 3):
             #     continue
 
-            name_distance = ngram(name, node.get('name')) * 100
+            name_distance = ngram_wrap(name, node.get('name')) * 100
 
             if (name_distance < 10):
                 continue
@@ -151,8 +164,8 @@ def get_discipline_nodes_by_name_and_description(name, disciplines):
             node = record.value()
             description = node.get('description')
 
-            name_distance = ngram(name, node.get('name')) * 100
-            description_distance = ngram(name, description) * 100
+            name_distance = ngram_wrap(name, node.get('name')) * 100
+            description_distance = ngram_wrap(name, description) * 100
 
             # name_distance = 5
             # for name_word in name.split(' '):
@@ -199,6 +212,7 @@ def get_all_disciplines():
             result.append({'id': node.id, 'name': node.get('name'), 'desc': node.get('description')})
 
     return result
+
 
 def close_db():
     if db is not None:
